@@ -1,9 +1,9 @@
 import { SafeAreaView, StyleSheet, Text } from "react-native";
 
-export default function TabTwoScreen() {
+export default function Camera() {
   return (
     <SafeAreaView>
-      <Text>Hello World</Text>
+      <Text>Settings Page</Text>
     </SafeAreaView>
   );
 }

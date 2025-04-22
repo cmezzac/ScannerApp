@@ -4,7 +4,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView>
       <View>
-        <Text>Hello World</Text>
+        <Text>Home Page</Text>
       </View>
     </SafeAreaView>
   );
