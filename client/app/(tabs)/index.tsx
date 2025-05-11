@@ -12,6 +12,7 @@ import { useRouter } from "expo-router";
 import PacketoHeader from "@/components/PacketoHeader";
 import ScreenName from "@/components/screenName";
 import PendingPage from "../(stack)/pendingPage";
+import ScanButton from "@/components/ScanButton";
 
 export default function HomeScreen() {
   const packageCount = 10;
@@ -41,6 +42,12 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
       </Card>
+
+      <TouchableOpacity onPress={() => router.push("/(stack)/camera")}>
+        <View style={styles.scanButtonContainer}>
+          <ScanButton></ScanButton>
+        </View>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -91,5 +98,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#007AFF",
     marginRight: 4,
+  },
+  scanButtonContainer: {
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#2C2C2C",
+    borderRadius: 50,
+    width: "70%",
+    height: 60,
+    marginTop: "30%",
   },
 });
