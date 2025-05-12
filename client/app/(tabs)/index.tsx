@@ -24,18 +24,35 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <PacketoHeader></PacketoHeader>
       <ScreenName title="Home" isHeader={true}></ScreenName>
-      <Card style={styles.card1Style}>
-        <Text style={styles.cardHeaderText}>Packages scanned today </Text>
-        <Text style={styles.countText}>{packageCount}</Text>
+      <Card style={styles.card2Style}>
+        <TouchableOpacity
+          onPress={() => {
+            router.push("/(stack)/confirmedPage");
+          }}
+        >
+          <View style={styles.headerWithLight}>
+            <Text style={styles.cardHeaderText}>Confirmed Packages</Text>
+            <View style={styles.greenLight} />
+          </View>
+          <Text style={styles.countText}>{packageCount}</Text>
+          <View style={styles.viewPendingRow}>
+            <Text style={styles.viewPendingText}>View pending packages</Text>
+            <Feather name="chevron-right" size={20} color="#007AFF" />
+          </View>
+        </TouchableOpacity>
       </Card>
       <Card style={styles.card2Style}>
-        <Text style={styles.cardHeaderText}>Pending Packages</Text>
-        <Text style={styles.countText}>{pendingCount}</Text>
         <TouchableOpacity
           onPress={() => {
             router.push("/(stack)/pendingPage");
           }}
         >
+          <View style={styles.headerWithLight}>
+            <Text style={styles.cardHeaderText}>Pending Packages</Text>
+            <View style={styles.yellowLight} />
+          </View>
+          <Text style={styles.countText}>{pendingCount}</Text>
+
           <View style={styles.viewPendingRow}>
             <Text style={styles.viewPendingText}>View pending packages</Text>
             <Feather name="chevron-right" size={20} color="#007AFF" />
@@ -65,12 +82,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "500",
     fontFamily: "Roboto",
-  },
-  card1Style: {
-    height: "18%",
-    margin: "5%",
-    backgroundColor: "#fff",
-    borderRadius: 12,
   },
   card2Style: {
     height: "20%",
@@ -108,5 +119,34 @@ const styles = StyleSheet.create({
     width: "70%",
     height: 60,
     marginTop: "30%",
+  },
+  headerWithLight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+
+  greenLight: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "#4CD964", // Apple-style green
+    shadowColor: "#4CD964",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.7,
+    shadowRadius: 4,
+    elevation: 3, // Android shadow
+  },
+
+  yellowLight: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "#FFD60A", // Clean yellow
+    shadowColor: "#FFD60A",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.7,
+    shadowRadius: 4,
+    elevation: 3,
   },
 });

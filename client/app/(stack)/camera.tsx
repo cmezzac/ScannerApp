@@ -10,6 +10,8 @@ import {
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, Tabs } from "expo-router";
+import { HeaderBackButton } from "@react-navigation/elements";
+import { useRouter } from "expo-router";
 
 const { width, height } = Dimensions.get("window");
 
@@ -18,6 +20,7 @@ export default function CameraComponent() {
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [flash, setFlash] = useState<"off" | "on">("off");
   const cameraRef = useRef<CameraView>(null);
+  const router = useRouter();
 
   const takePicture = async () => {
     if (cameraRef.current) {
@@ -74,9 +77,20 @@ export default function CameraComponent() {
         flash={flash}
       />
 
+      <View style={styles.overlay}>
+        {/* Top-left */}
+        <View style={[styles.corner, styles.topLeft]} />
+        {/* Top-right */}
+        <View style={[styles.corner, styles.topRight]} />
+        {/* Bottom-left */}
+        <View style={[styles.corner, styles.bottomLeft]} />
+        {/* Bottom-right */}
+        <View style={[styles.corner, styles.bottomRight]} />
+      </View>
+
       {/* Top Controls */}
       <View style={styles.topControls}>
-        <TouchableOpacity onPress={() => console.log("Close")}>
+        <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="close" size={30} color="white" />
         </TouchableOpacity>
         <TouchableOpacity
@@ -178,5 +192,49 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "600",
     fontSize: 16,
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 5,
+    pointerEvents: "none",
+  },
+
+  corner: {
+    position: "absolute",
+    width: "8%",
+    aspectRatio: 1,
+    borderColor: "#00FFAA",
+  },
+
+  topLeft: {
+    top: "20%",
+    left: "10%",
+    borderTopWidth: 4,
+    borderLeftWidth: 4,
+  },
+
+  topRight: {
+    top: "20%",
+    right: "10%",
+    borderTopWidth: 4,
+    borderRightWidth: 4,
+  },
+
+  bottomLeft: {
+    bottom: "50%",
+    left: "10%",
+    borderBottomWidth: 4,
+    borderLeftWidth: 4,
+  },
+
+  bottomRight: {
+    bottom: "50%",
+    right: "10%",
+    borderBottomWidth: 4,
+    borderRightWidth: 4,
   },
 });
