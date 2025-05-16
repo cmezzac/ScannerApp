@@ -6,12 +6,15 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  SafeAreaView,
 } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, Tabs } from "expo-router";
 import { HeaderBackButton } from "@react-navigation/elements";
 import { useRouter } from "expo-router";
+import ScreenName from "@/components/screenName";
+import ReturnButton from "@/components/returnButton";
 
 const { width, height } = Dimensions.get("window");
 
@@ -59,7 +62,7 @@ export default function CameraComponent() {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.submitButton}
-            onPress={() => console.log("Submit")}
+            onPress={() => router.push("/(stack)/readerDetails")}
           >
             <Text style={styles.buttonText}>Submit</Text>
           </TouchableOpacity>
@@ -69,13 +72,20 @@ export default function CameraComponent() {
   }
 
   return (
-    <View style={styles.container}>
-      <CameraView
-        ref={cameraRef}
-        style={StyleSheet.absoluteFill}
-        facing="back"
-        flash={flash}
-      />
+    <SafeAreaView style={styles.container}>
+      <ReturnButton></ReturnButton>
+      <ScreenName title="Scanner" isHeader={true}></ScreenName>
+      <View style={styles.cameraContainer}>
+        <CameraView
+          ref={cameraRef}
+          style={StyleSheet.absoluteFill}
+          facing="back"
+          flash={flash}
+        />
+      </View>
+      <Text style={styles.scanNote}>
+        Scan must include the Name and Appartment Section
+      </Text>
 
       <View style={styles.overlay}>
         {/* Top-left */}
@@ -90,34 +100,37 @@ export default function CameraComponent() {
 
       {/* Top Controls */}
       <View style={styles.topControls}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="close" size={30} color="white" />
-        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setFlash(flash === "off" ? "on" : "off")}
         >
           <Ionicons
             name={flash === "on" ? "flash" : "flash-off"}
             size={30}
-            color="white"
+            color="black"
           />
         </TouchableOpacity>
       </View>
 
-      {/* Capture Button */}
       <View style={styles.bottomControls}>
         <TouchableOpacity onPress={takePicture} style={styles.captureOuter}>
           <View style={styles.captureInner} />
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "black",
+    backgroundColor: "white",
+  },
+  cameraContainer: {
+    flex: 1,
+    marginLeft: "10%",
+    marginRight: "10%",
+    marginTop: "15%",
+    marginBottom: "85%",
   },
   centered: {
     flex: 1,
@@ -132,11 +145,11 @@ const styles = StyleSheet.create({
   },
   topControls: {
     position: "absolute",
-    top: 60,
-    left: 20,
+    top: "20%",
     right: 20,
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: "column",
+    alignItems: "flex-end",
+    gap: 12,
   },
   bottomControls: {
     position: "absolute",
@@ -149,7 +162,7 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     borderWidth: 5,
-    borderColor: "white",
+    borderColor: "black",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -157,24 +170,24 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: "white",
+    backgroundColor: "black",
   },
   previewContainer: {
     flex: 1,
-    backgroundColor: "black",
+    backgroundColor: "white",
     justifyContent: "center",
     alignItems: "center",
   },
   previewImage: {
     width: width,
-    height: height * 0.8,
+    height: height * 0.9,
     resizeMode: "contain",
   },
   previewButtons: {
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",
-    marginTop: 20,
+    marginTop: 0,
   },
   retakeButton: {
     backgroundColor: "#777",
@@ -207,34 +220,44 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "8%",
     aspectRatio: 1,
-    borderColor: "#00FFAA",
+    borderColor: "black",
   },
 
   topLeft: {
-    top: "20%",
+    top: "22%",
     left: "10%",
     borderTopWidth: 4,
     borderLeftWidth: 4,
   },
 
   topRight: {
-    top: "20%",
+    top: "22%",
     right: "10%",
     borderTopWidth: 4,
     borderRightWidth: 4,
   },
 
   bottomLeft: {
-    bottom: "50%",
+    bottom: "43%",
     left: "10%",
     borderBottomWidth: 4,
     borderLeftWidth: 4,
   },
 
   bottomRight: {
-    bottom: "50%",
+    bottom: "43%",
     right: "10%",
     borderBottomWidth: 4,
     borderRightWidth: 4,
+  },
+  scanNote: {
+    position: "absolute",
+    bottom: "40%",
+    width: "100%",
+    textAlign: "center",
+    fontFamily: "Inter",
+    fontWeight: "600",
+    fontSize: 24,
+    color: "black",
   },
 });
