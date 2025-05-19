@@ -18,8 +18,8 @@ import { useGlobal } from "../../context/globalContext";
 const { width, height } = Dimensions.get("window");
 
 export default function CameraComponent() {
-  const { fullPackageUri, setFullPackageUri, currentStep, setCurrentStep } =
-    useGlobal();
+  const { fullPackageUri, setFullPackageUri, setDetailsUri } = useGlobal();
+
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<CameraView>(null);
   const router = useRouter();
@@ -28,9 +28,9 @@ export default function CameraComponent() {
     if (cameraRef.current) {
       const photo = await cameraRef.current.takePictureAsync();
       if (photo) {
-        setFullPackageUri(photo.uri);
+        setDetailsUri(photo.uri);
       }
-      router.push("/cameraDetails");
+      router.push("/readerDetails");
     }
   };
 
@@ -55,7 +55,7 @@ export default function CameraComponent() {
 
       <ScreenName title="Scanner" isHeader={true}></ScreenName>
       <View style={{ marginTop: -20, paddingHorizontal: 20 }}>
-        <Stepper currentStep={0} />
+        <Stepper currentStep={1} />
       </View>
 
       <View style={styles.cameraContainer}>
@@ -83,8 +83,8 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: "10%",
     marginRight: "10%",
-    marginTop: "10%",
-    marginBottom: "40%",
+    marginTop: "20%",
+    marginBottom: "80%",
     borderRadius: 30,
     overflow: "hidden",
     borderWidth: 2,
