@@ -11,8 +11,6 @@ import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import PacketoHeader from "@/components/PacketoHeader";
 import ScreenName from "@/components/screenName";
-import PendingPage from "../(stack)/pendingPage";
-import ScanButton from "@/components/ScanButton";
 
 export default function HomeScreen() {
   const packageCount = 10;
@@ -59,12 +57,6 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
       </Card>
-
-      <TouchableOpacity onPress={() => router.push("/(stack)/camera")}>
-        <View style={styles.scanButtonContainer}>
-          <ScanButton></ScanButton>
-        </View>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 }
