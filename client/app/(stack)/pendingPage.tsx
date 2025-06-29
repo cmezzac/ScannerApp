@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -9,28 +9,58 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import ReturnButton from "@/components/returnButton";
 import ScreenName from "@/components/screenName";
+import { usePendingPackages } from "@/context/pendingPackageContext";
+import { ApartmentSummary } from "@/types/types";
+import { fetchPendingPackages } from "@/services/packageService";
 
 const { width } = Dimensions.get("window");
-import { useRouter } from "expo-router";
-
-const packages = [
-  { apartment: "Apartment 200", count: 4 },
-  { apartment: "Apartment 900", count: 1 },
-  { apartment: "Apartment 1000", count: 4 },
-  { apartment: "Apartment 1230", count: 4 },
-  { apartment: "Apartment 1456", count: 0 },
-];
 
 export default function PendingPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const router = useRouter(); // <-- add this
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
-  const filteredPackages = packages.filter((pkg) =>
-    pkg.apartment.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const { allPackages, setSelectedApartment, setAllPackages } =
+    usePendingPackages();
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const response = await fetchPendingPackages();
+        if (!response || response.length === 0) {
+          console.warn("No packages received");
+        } else {
+          console.log(response);
+          setAllPackages(response);
+        }
+      } catch (error) {
+        console.error("Failed to fetch packages", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  const packages: ApartmentSummary[] = useMemo(() => {
+    return (
+      allPackages?.map((apt) => ({
+        apartmentNumber: apt.apartmentNumber,
+        apartment: `Apartment ${apt.apartmentNumber}`,
+        count: apt.packages.length,
+      })) ?? []
+    );
+  }, [allPackages]);
+
+  const filteredPackages = useMemo(() => {
+    return packages.filter((pkg) =>
+      pkg.apartment.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [packages, searchTerm]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -40,7 +70,7 @@ export default function PendingPage() {
         <ScreenName title="Pending Packages" isHeader={false} />
 
         <TextInput
-          placeholder="Search for an apartment"
+          placeholder="Search for an Apartment"
           placeholderTextColor="#999"
           value={searchTerm}
           onChangeText={setSearchTerm}
@@ -48,36 +78,45 @@ export default function PendingPage() {
         />
 
         <View style={styles.packageBox}>
-          <ScrollView
-            style={styles.scrollArea}
-            showsVerticalScrollIndicator={false}
-          >
-            {filteredPackages.map((item, index) => (
-              <View key={index} style={styles.packageRow}>
-                <View>
-                  <Text style={styles.apartment}>{item.apartment}</Text>
-                  <Text style={styles.packageCount}>
-                    {item.count === 0
-                      ? "No packages"
-                      : `${item.count} package${item.count > 1 ? "s" : ""}`}
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  disabled={item.count === 0}
-                  onPress={() => router.push("/(stack)/PendingPackageInfoPage")}
-                >
-                  <Text
-                    style={[
-                      styles.viewText,
-                      item.count === 0 && styles.disabledViewText,
-                    ]}
+          {loading ? (
+            <Text style={{ textAlign: "center", marginTop: 20 }}>
+              Loading...
+            </Text>
+          ) : (
+            <ScrollView
+              style={styles.scrollArea}
+              showsVerticalScrollIndicator={false}
+            >
+              {filteredPackages.map((item, index) => (
+                <View key={index} style={styles.packageRow}>
+                  <View>
+                    <Text style={styles.apartment}>{item.apartment}</Text>
+                    <Text style={styles.packageCount}>
+                      {item.count === 0
+                        ? "No packages"
+                        : `${item.count} package${item.count > 1 ? "s" : ""}`}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    disabled={item.count === 0}
+                    onPress={() => {
+                      setSelectedApartment(item.apartmentNumber);
+                      router.push("/(stack)/PendingPackageInfoPage");
+                    }}
                   >
-                    View
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </ScrollView>
+                    <Text
+                      style={[
+                        styles.viewText,
+                        item.count === 0 && styles.disabledViewText,
+                      ]}
+                    >
+                      View
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </ScrollView>
+          )}
         </View>
       </View>
     </SafeAreaView>

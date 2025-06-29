@@ -3,38 +3,38 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import ReturnButton from "@/components/returnButton";
 import ScreenName from "@/components/screenName";
 import PackageItem from "@/components/PackageItemPending";
+import { usePendingPackages } from "@/context/pendingPackageContext";
 
 export default function PendingPackageInfoPage() {
-  const demoPackages = [
-    {
-      title: "Package 1 - Purolator",
-      name: "John Doe",
-      imageUrl: "https://via.placeholder.com/150",
-      scannedDate: "2024-06-01",
-      urgent: true,
-    },
-    {
-      title: "Package 2 - Amazon",
-      name: "Jane Smith",
-      imageUrl: "https://via.placeholder.com/150",
-      scannedDate: "2024-06-03",
-      urgent: false,
-    },
-    {
-      title: "Package 3 - Fedex",
-      name: "Bob Marley",
-      imageUrl: "https://via.placeholder.com/150",
-      scannedDate: "2024-06-05",
-      urgent: true,
-    },
-    {
-      title: "Package 4 - Other",
-      name: "Alice Blue",
-      imageUrl: "",
-      scannedDate: "",
-      urgent: false,
-    },
-  ];
+  const { selectedApartment, allPackages } = usePendingPackages();
+
+  if (!allPackages) {
+    return (
+      <SafeAreaView style={styles.bigContainer}>
+        <ReturnButton />
+        <ScreenName title="Pending" isHeader={false} />
+        <Text style={{ padding: 20 }}>Loading packages...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  const apartmentData = allPackages.find(
+    (apt) => apt.apartmentNumber === selectedApartment
+  );
+
+  if (!apartmentData) {
+    return (
+      <SafeAreaView style={styles.bigContainer}>
+        <ReturnButton />
+        <ScreenName title="Pending" isHeader={false} />
+        <Text style={{ padding: 20 }}>
+          No packages found for this apartment.
+        </Text>
+      </SafeAreaView>
+    );
+  }
+
+  const packages = apartmentData?.packages || [];
 
   return (
     <SafeAreaView style={styles.bigContainer}>
@@ -49,13 +49,13 @@ export default function PendingPackageInfoPage() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollPadding}
       >
-        {demoPackages.map((item, index) => (
+        {packages.map((item, index) => (
           <PackageItem
             key={index}
-            title={item.title}
+            title={`#${item.trackingNumber} - ${item.courrier}`}
             name={item.name}
-            imageUrl={item.imageUrl}
-            scannedDate={item.scannedDate}
+            imageUrl={item.photo}
+            scannedDate={new Date(item.scannedDate).toLocaleDateString()}
             urgent={item.urgent}
           />
         ))}
