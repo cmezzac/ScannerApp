@@ -8,6 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import ReturnButton from "@/components/returnButton";
@@ -33,7 +34,6 @@ export default function PendingPage() {
         if (!response || response.length === 0) {
           console.warn("No packages received");
         } else {
-          console.log(response);
           setAllPackages(response);
         }
       } catch (error) {
@@ -79,8 +79,14 @@ export default function PendingPage() {
 
         <View style={styles.packageBox}>
           {loading ? (
-            <Text style={{ textAlign: "center", marginTop: 20 }}>
-              Loading...
+            <ActivityIndicator
+              size="large"
+              color="#007aff"
+              style={{ marginTop: 20 }}
+            />
+          ) : filteredPackages.length === 0 ? (
+            <Text style={{ textAlign: "center", marginTop: 20, color: "#999" }}>
+              No apartments found.
             </Text>
           ) : (
             <ScrollView

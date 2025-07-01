@@ -55,7 +55,15 @@ export default function PendingPackageInfoPage() {
             title={`#${item.trackingNumber} - ${item.courrier}`}
             name={item.name}
             imageUrl={item.photo}
-            scannedDate={new Date(item.scannedDate).toLocaleDateString()}
+            scannedDate={new Date(item.scannedDate).toLocaleString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
+            })}
             urgent={item.urgent}
           />
         ))}

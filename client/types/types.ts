@@ -24,3 +24,16 @@ export type ApartmentSummary = {
   apartment: string; // e.g. "Apartment 101"
   count: number;
 };
+
+export type ConfirmedApartmentGroup = {
+  apartmentNumber: string;
+  packages: {
+    trackingNumber: string;
+    name: string;
+    scannedDate: string;
+    urgent: boolean;
+    courrier: string;
+    photo: string;
+    confirmedDate: string;
+  }[];
+};

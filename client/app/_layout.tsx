@@ -11,6 +11,7 @@ import "react-native-reanimated";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { GlobalProvider } from "../context/globalContext";
 import { PendingPackagesProvider } from "@/context/pendingPackageContext";
+import { ConfirmedPackagesProvider } from "@/context/confirmedPackageContext";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -27,12 +28,14 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <GlobalProvider>
         <PendingPackagesProvider>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(stack)" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <StatusBar style="auto" />
+          <ConfirmedPackagesProvider>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="(stack)" options={{ headerShown: false }} />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+            <StatusBar style="auto" />
+          </ConfirmedPackagesProvider>
         </PendingPackagesProvider>
       </GlobalProvider>
     </ThemeProvider>

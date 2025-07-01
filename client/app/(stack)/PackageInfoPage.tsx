@@ -4,38 +4,18 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import ReturnButton from "@/components/returnButton";
 import ScreenName from "@/components/screenName";
 import PackageItem from "@/components/PackageItemConfirmation";
+import { useConfirmedPackages } from "@/context/confirmedPackageContext";
+import { useState } from "react";
 
 export default function PackageInfoPage() {
-  const demoPackages = [
-    {
-      title: "Package 1 - Purolator",
-      name: "John Doe",
-      imageUrl: "https://via.placeholder.com/150",
-      scannedDate: "2024-06-01",
-      confirmedDate: "2024-06-02",
-    },
-    {
-      title: "Package 2 - Amazon",
-      name: "Jane Smith",
-      imageUrl: "https://via.placeholder.com/150",
-      scannedDate: "2024-06-03",
-      confirmedDate: "2024-06-03",
-    },
-    {
-      title: "Package 3 - Fedex",
-      name: "Bob Marley",
-      imageUrl: "https://via.placeholder.com/150",
-      scannedDate: "2024-06-05",
-      confirmedDate: "2024-06-06",
-    },
-    {
-      title: "Package 4 - Other",
-      name: "Alice Blue",
-      imageUrl: "",
-      scannedDate: "",
-      confirmedDate: "",
-    },
-  ];
+  const { selectedConfirmedApartment, allConfirmedPackages } =
+    useConfirmedPackages();
+
+  const apartmentData = allConfirmedPackages?.find(
+    (apt) => apt.apartmentNumber === selectedConfirmedApartment
+  );
+
+  const packages = apartmentData?.packages || [];
 
   return (
     <SafeAreaView style={styles.bigContainer}>
@@ -50,14 +30,34 @@ export default function PackageInfoPage() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollPadding}
       >
-        {demoPackages.map((item, index) => (
+        {packages.map((item, index) => (
           <PackageItem
             key={index}
-            title={item.title}
+            title={`#${item.trackingNumber} - ${item.courrier}`}
             name={item.name}
-            imageUrl={item.imageUrl}
-            scannedDate={item.scannedDate}
-            confirmedDate={item.confirmedDate}
+            imageUrl={item.photo}
+            scannedDate={new Date(item.scannedDate).toLocaleString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
+            })}
+            confirmedDate={new Date(item.confirmedDate).toLocaleString(
+              "en-US",
+              {
+                weekday: "long",
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+                hour12: true,
+              }
+            )}
+            urgent={item.urgent}
           />
         ))}
       </ScrollView>

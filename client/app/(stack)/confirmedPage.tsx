@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -8,28 +8,53 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
 
 import ReturnButton from "@/components/returnButton";
 import ScreenName from "@/components/screenName";
+import { fetchConfirmedPackages } from "@/services/packageService";
+import { useConfirmedPackages } from "@/context/confirmedPackageContext";
 
 const { width } = Dimensions.get("window");
-const router = useRouter();
-
-const packages = [
-  { apartment: "Apartment 200", count: 4 },
-  { apartment: "Apartment 900", count: 1 },
-  { apartment: "Apartment 1000", count: 4 },
-  { apartment: "Apartment 1230", count: 4 },
-  { apartment: "Apartment 1456", count: 0 },
-  { apartment: "Apartment 1456", count: 0 },
-  { apartment: "Apartment 1456", count: 0 },
-  { apartment: "Apartment 1456", count: 0 },
-];
 
 export default function ConfirmedPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const {
+    allConfirmedPackages,
+    setAllConfirmedPackages,
+    setSelectedConfirmedApartment,
+  } = useConfirmedPackages();
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const response = await fetchConfirmedPackages();
+        if (response?.length) {
+          setAllConfirmedPackages(response);
+        } else {
+          console.warn("No packages received");
+        }
+      } catch (error) {
+        console.error("Failed to fetch packages", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  const packages = (allConfirmedPackages || []).map((apt) => ({
+    apartment: `Apartment ${apt.apartmentNumber}`,
+    apartmentNumber: apt.apartmentNumber,
+    count: apt.packages.length,
+  }));
 
   const filteredPackages = packages.filter((pkg) =>
     pkg.apartment.toLowerCase().includes(searchTerm.toLowerCase())
@@ -51,43 +76,51 @@ export default function ConfirmedPage() {
         />
 
         <View style={styles.packageBox}>
-          <ScrollView
-            style={styles.scrollArea}
-            showsVerticalScrollIndicator={false}
-          >
-            {filteredPackages.map((item, index) => (
-              <View key={index} style={styles.packageRow}>
-                <View>
-                  <Text style={styles.apartment}>{item.apartment}</Text>
-                  <Text style={styles.packageCount}>
-                    {item.count === 0
-                      ? "No packages"
-                      : `${item.count} package${item.count > 1 ? "s" : ""}`}
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  disabled={item.count === 0}
-                  onPress={() =>
-                    item.count > 0 &&
-                    router.push(
-                      `/(stack)/PackageInfoPage?apartment=${encodeURIComponent(
-                        item.apartment
-                      )}`
-                    )
-                  }
-                >
-                  <Text
-                    style={[
-                      styles.viewText,
-                      item.count === 0 && styles.disabledViewText,
-                    ]}
+          {loading ? (
+            <ActivityIndicator
+              size="large"
+              color="#007aff"
+              style={{ marginTop: 20 }}
+            />
+          ) : filteredPackages.length === 0 ? (
+            <Text style={{ textAlign: "center", marginTop: 20, color: "#999" }}>
+              No apartments found.
+            </Text>
+          ) : (
+            <ScrollView
+              style={styles.scrollArea}
+              showsVerticalScrollIndicator={false}
+            >
+              {filteredPackages.map((item, index) => (
+                <View key={index} style={styles.packageRow}>
+                  <View>
+                    <Text style={styles.apartment}>{item.apartment}</Text>
+                    <Text style={styles.packageCount}>
+                      {item.count === 0
+                        ? "No packages"
+                        : `${item.count} package${item.count > 1 ? "s" : ""}`}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    disabled={item.count === 0}
+                    onPress={() => {
+                      setSelectedConfirmedApartment(item.apartmentNumber);
+                      router.push("/(stack)/PackageInfoPage");
+                    }}
                   >
-                    View
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </ScrollView>
+                    <Text
+                      style={[
+                        styles.viewText,
+                        item.count === 0 && styles.disabledViewText,
+                      ]}
+                    >
+                      View
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </ScrollView>
+          )}
         </View>
       </View>
     </SafeAreaView>

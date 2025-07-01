@@ -9,6 +9,7 @@ type PackageItemWithDateProps = {
   imageUrl: string;
   scannedDate: string;
   confirmedDate: string;
+  urgent: boolean;
 };
 
 export default function PackageItemConfirmation({
@@ -17,6 +18,7 @@ export default function PackageItemConfirmation({
   imageUrl,
   scannedDate,
   confirmedDate,
+  urgent,
 }: PackageItemWithDateProps) {
   const [collapsed, setCollapsed] = useState(true);
 
@@ -42,6 +44,8 @@ export default function PackageItemConfirmation({
           <Text>{scannedDate}</Text>
           <Text style={styles.label}>Confirmed Date</Text>
           <Text>{confirmedDate}</Text>
+          <Text style={styles.label}>Urgent</Text>
+          <Text>{urgent ? "Yes" : "No"}</Text>
           {imageUrl ? (
             <Image source={{ uri: imageUrl }} style={styles.image} />
           ) : null}

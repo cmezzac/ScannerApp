@@ -6,3 +6,10 @@ export const fetchPendingPackages = async () => {
   if (!res.ok) throw new Error("Network response was not ok");
   return await res.json();
 };
+
+export const fetchConfirmedPackages = async () => {
+  console.log("API URL: " + `${apiUrl}/package/confirmedPackages`);
+  const res = await fetch(`${apiUrl}/package/confirmedPackages`);
+  if (!res.ok) throw new Error("Network response was not ok");
+  return await res.json();
+};
