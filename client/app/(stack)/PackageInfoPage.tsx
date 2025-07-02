@@ -6,6 +6,7 @@ import ScreenName from "@/components/screenName";
 import PackageItem from "@/components/PackageItemConfirmation";
 import { useConfirmedPackages } from "@/context/confirmedPackageContext";
 import { useState } from "react";
+import { image1, image2, image3, image4 } from "@/constants";
 
 export default function PackageInfoPage() {
   const { selectedConfirmedApartment, allConfirmedPackages } =
@@ -14,6 +15,9 @@ export default function PackageInfoPage() {
   const apartmentData = allConfirmedPackages?.find(
     (apt) => apt.apartmentNumber === selectedConfirmedApartment
   );
+
+  const imageArray: string[] = [image1, image2, image3, image4];
+  const base64Image = imageArray[Math.floor(Math.random() * imageArray.length)];
 
   const packages = apartmentData?.packages || [];
 
@@ -35,7 +39,7 @@ export default function PackageInfoPage() {
             key={index}
             title={`#${item.trackingNumber} - ${item.courrier}`}
             name={item.name}
-            imageUrl={item.photo}
+            imageUrl={item.photo ? item.photo : base64Image}
             scannedDate={new Date(item.scannedDate).toLocaleString("en-US", {
               weekday: "long",
               year: "numeric",
