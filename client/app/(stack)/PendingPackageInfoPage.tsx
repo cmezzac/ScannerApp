@@ -4,9 +4,13 @@ import ReturnButton from "@/components/returnButton";
 import ScreenName from "@/components/screenName";
 import PackageItem from "@/components/PackageItemPending";
 import { usePendingPackages } from "@/context/pendingPackageContext";
+import { image1, image2, image3, image4 } from "@/constants";
 
 export default function PendingPackageInfoPage() {
   const { selectedApartment, allPackages } = usePendingPackages();
+
+  const imageArray: string[] = [image1, image2, image3, image4];
+  const base64Image = imageArray[Math.floor(Math.random() * imageArray.length)];
 
   if (!allPackages) {
     return (
@@ -36,6 +40,8 @@ export default function PendingPackageInfoPage() {
 
   const packages = apartmentData?.packages || [];
 
+  console.log(packages);
+
   return (
     <SafeAreaView style={styles.bigContainer}>
       <ReturnButton />
@@ -54,7 +60,7 @@ export default function PendingPackageInfoPage() {
             key={index}
             title={`#${item.trackingNumber} - ${item.courrier}`}
             name={item.name}
-            imageUrl={item.photo}
+            imageUrl={item.photo ? item.photo : base64Image}
             scannedDate={new Date(item.scannedDate).toLocaleString("en-US", {
               weekday: "long",
               year: "numeric",
