@@ -20,12 +20,14 @@ type PackageModalProps = {
   isVisible: boolean;
   onClose: () => void;
   packages: PackageInfo[];
+  apartment: string;
 };
 
 export default function PackageModal({
   isVisible,
   onClose,
   packages,
+  apartment,
 }: PackageModalProps) {
   return (
     <Modal

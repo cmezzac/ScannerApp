@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -15,31 +15,10 @@ const { width } = Dimensions.get("window");
 import * as Haptics from "expo-haptics";
 import { Audio } from "expo-av";
 
-const packages = [
-  { apartment: "Apartment 900", count: 1 },
-  { apartment: "Apartment 2000", count: 2 },
-  { apartment: "Apartment 2060", count: 1 },
-];
-
-const isNotifyGreen = packages.length > 0;
 import { useRouter } from "expo-router";
+import { useScannedPackages } from "@/context/scannedPackageContext";
 
 const router = useRouter();
-
-const examplePackages = [
-  {
-    title: "Package 1 - Purolator",
-    name: "Fiamma Saragosa",
-    urgent: false,
-    imageUrl: "https://i.imgur.com/5Q7Yz5y.jpg",
-  },
-  {
-    title: "Package 2 - Canada Post",
-    name: "Fiamma Saragosa",
-    urgent: true,
-    imageUrl: "https://i.imgur.com/UYiroysl.jpg",
-  },
-];
 
 const handlePress = async () => {
   await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -53,24 +32,55 @@ const handlePress = async () => {
 
 export default function ScanPackageBox() {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const toggleModal = () => setIsModalVisible((prev) => !prev);
+  const [selectedApartment, setSelectedApartment] = useState<string | null>(
+    null
+  );
+
+  const [packages, setPackages] = useState<
+    { apartment: string; count: number }[]
+  >([]);
+
+  const openModal = (apartment: string) => {
+    setSelectedApartment(apartment);
+    setIsModalVisible(true);
+  };
+
+  const { groupedPackages, getPackageSummary, addPackageToApartment } =
+    useScannedPackages();
+
+  useEffect(() => {
+    const result = getPackageSummary();
+    setPackages(result);
+  }, [groupedPackages]);
+
+  const isNotifyGreen = packages.length > 0;
 
   return (
     <View style={styles.box}>
-      <ScrollView style={styles.scrollArea}>
-        {packages.map((item, index) => (
-          <View key={index} style={styles.packageRow}>
-            <View>
-              <Text style={styles.apartment}>{item.apartment}</Text>
-              <Text style={styles.packageCount}>
-                {item.count} Package{item.count > 1 ? "s" : ""}
-              </Text>
+      <ScrollView
+        style={styles.scrollArea}
+        contentContainerStyle={
+          packages.length === 0 ? styles.emptyContainer : undefined
+        }
+        showsVerticalScrollIndicator={false}
+      >
+        {packages.length === 0 ? (
+          <Text style={styles.emptyText}>No packages scanned</Text>
+        ) : (
+          packages.map((item, index) => (
+            <View key={index} style={styles.packageRow}>
+              <View>
+                <Text style={styles.apartment}>{item.apartment}</Text>
+                <Text style={styles.packageCount}>
+                  {item.count} Package{item.count > 1 ? "s" : ""}
+                </Text>
+              </View>
+              <TouchableOpacity onPress={() => openModal(item.apartment)}>
+                <Text style={styles.viewText}>View</Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity onPress={toggleModal}>
-              <Text style={styles.viewText}>View</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
+          ))
+        )}
       </ScrollView>
       <View style={{ alignItems: "center" }}>
         <TouchableOpacity
@@ -89,11 +99,14 @@ export default function ScanPackageBox() {
           </Text>
         </TouchableOpacity>
       </View>
-      <PackageModal
-        packages={examplePackages}
-        isVisible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
-      />
+      {selectedApartment && (
+        <PackageModal
+          isVisible={isModalVisible}
+          onClose={() => setIsModalVisible(false)}
+          packages={groupedPackages[selectedApartment] || []}
+          apartment={selectedApartment}
+        />
+      )}
     </View>
   );
 }
@@ -150,7 +163,19 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     alignItems: "center",
-    justifyContent: "flex-end", // ⬅️ Pushes modal to bottom
+    justifyContent: "flex-end",
     margin: 0,
+  },
+  emptyContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: 150,
+  },
+
+  emptyText: {
+    fontSize: 16,
+    color: "#aaa",
+    fontStyle: "italic",
   },
 });

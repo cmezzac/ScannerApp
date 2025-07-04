@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -17,29 +17,58 @@ import { useGlobal } from "../../context/globalContext";
 import { sendImageToReadShippingLabel } from "@/services/scannerServer";
 import * as ImageManipulator from "expo-image-manipulator";
 import { enhanceImageForOCR } from "@/services/cameraService";
+import { useScannedPackages } from "@/context/scannedPackageContext";
 
 const { width, height } = Dimensions.get("window");
 
 export default function CameraComponent() {
-  const { fullPackageUri, setFullPackageUri, setDetailsUri } = useGlobal();
+  const { fullPackageUri, setDetailsUri } = useGlobal();
 
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<CameraView>(null);
   const router = useRouter();
 
+  const { currentPackage, setCurrentPackage } = useScannedPackages();
+
+  const [localPackageReady, setLocalPackageReady] = useState(false);
+
+  //Navigate only when localPackageReady so that we guarantee it's updated
+  useEffect(() => {
+    if (localPackageReady) {
+      router.push("/readerDetails");
+    }
+  }, [localPackageReady]);
+
   const takePicture = async () => {
     if (cameraRef.current) {
       const photo = await cameraRef.current.takePictureAsync();
+
       if (photo) {
         setDetailsUri(photo.uri);
 
         try {
           const detailsImage = await enhanceImageForOCR(photo.uri);
+
           const result = await sendImageToReadShippingLabel(
             detailsImage,
             fullPackageUri
           );
+
           console.log("Server response:", result);
+
+          // Parse and set currentPackage (auto-added in context)
+          const { apartment, courier, name, trackingNumber, urgent } = result;
+
+          setCurrentPackage({
+            apartment,
+            name,
+            urgent,
+            title: `Package - ${courier} (${trackingNumber})`,
+            imageUrl: fullPackageUri,
+            trackingNumber,
+          });
+
+          setLocalPackageReady(true); // ✅ Delay navigation until confirmed
         } catch (error) {
           console.log("Error sending image", error);
         }
