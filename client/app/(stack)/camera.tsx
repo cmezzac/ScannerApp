@@ -14,6 +14,7 @@ import ScreenName from "@/components/screenName";
 import ReturnButton from "@/components/returnButton";
 import Stepper from "@/components/progress_bar";
 import { useGlobal } from "../../context/globalContext";
+import { enhanceImageForOCR } from "@/services/cameraService";
 
 const { width, height } = Dimensions.get("window");
 
@@ -27,10 +28,14 @@ export default function CameraComponent() {
   const takePicture = async () => {
     if (cameraRef.current) {
       const photo = await cameraRef.current.takePictureAsync();
+
       if (photo) {
-        setFullPackageUri(photo.uri);
+        const enhancedBase64 = await enhanceImageForOCR(photo.uri);
+
+        setFullPackageUri(enhancedBase64);
+
+        router.push("/cameraDetails");
       }
-      router.push("/cameraDetails");
     }
   };
 
