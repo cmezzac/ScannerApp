@@ -16,18 +16,26 @@ import { useScannedPackages } from "@/context/scannedPackageContext";
 
 export default function ReaderDetails() {
   const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled((prev) => !prev);
+  const toggleSwitch = () => {
+    setIsEnabled((prev) => {
+      const newValue = !prev;
+
+      // If there's a current package, update its "urgent" field
+      if (currentPackage) {
+        setCurrentPackage({ ...currentPackage, urgent: newValue });
+      }
+
+      return newValue;
+    });
+  };
 
   const router = useRouter();
-  const { currentPackage } = useScannedPackages();
+  const { currentPackage, addPackageToApartment, setCurrentPackage } =
+    useScannedPackages();
 
   useEffect(() => {
-    console.log("📦 useEffect fired");
-
     if (currentPackage) {
-      console.log("✅ Tracking Number:", currentPackage.trackingNumber);
-    } else {
-      console.log("⛔ No current package available.");
+      setIsEnabled(currentPackage.urgent);
     }
   }, [currentPackage]);
 
@@ -61,7 +69,15 @@ export default function ReaderDetails() {
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={() => router.push("/(tabs)/scanner")}>
+        <TouchableOpacity
+          onPress={() => {
+            if (currentPackage) {
+              addPackageToApartment(currentPackage.apartment, currentPackage);
+              setCurrentPackage(null); // optional: clears it from context
+            }
+            router.push("/(tabs)/scanner"); // navigate after saving
+          }}
+        >
           <Text style={styles.buttonText}>Confirm</Text>
         </TouchableOpacity>
       </View>

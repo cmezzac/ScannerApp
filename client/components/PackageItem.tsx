@@ -37,7 +37,10 @@ export default function PackageItem({
           <Text>{name}</Text>
           <Text style={styles.label}>Urgent</Text>
           <Text>{urgent ? "Yes" : "No"}</Text>
-          <Image source={{ uri: imageUrl }} style={styles.image} />
+          <Image
+            source={{ uri: `data:image/jpeg;base64,${imageUrl}` }}
+            style={styles.image}
+          />
         </View>
       </Collapsible>
     </View>
@@ -82,7 +85,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: 120,
+    height: "70%",
     marginTop: 10,
     borderRadius: 8,
   },
