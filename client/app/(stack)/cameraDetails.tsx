@@ -14,8 +14,24 @@ import ScreenName from "@/components/screenName";
 import ReturnButton from "@/components/returnButton";
 import Stepper from "@/components/progress_bar";
 import { useGlobal } from "../../context/globalContext";
+import { sendImageToReadShippingLabel } from "@/services/scannerServer";
+import * as ImageManipulator from "expo-image-manipulator";
 
 const { width, height } = Dimensions.get("window");
+
+const enhanceImageForOCR = async (uri: string): Promise<string> => {
+  const result = await ImageManipulator.manipulateAsync(
+    uri,
+    [{ resize: { width: 1000 } }],
+    {
+      compress: 1,
+      format: ImageManipulator.SaveFormat.JPEG,
+      base64: true,
+    }
+  );
+
+  return result.base64!;
+};
 
 export default function CameraComponent() {
   const { fullPackageUri, setFullPackageUri, setDetailsUri } = useGlobal();
@@ -29,8 +45,17 @@ export default function CameraComponent() {
       const photo = await cameraRef.current.takePictureAsync();
       if (photo) {
         setDetailsUri(photo.uri);
+
+        try {
+          const base64 = await enhanceImageForOCR(photo.uri);
+          const result = await sendImageToReadShippingLabel(base64);
+          console.log("Server response:", result);
+        } catch (error) {
+          console.log("Error sending image", error);
+        }
+
+        router.push("/readerDetails");
       }
-      router.push("/readerDetails");
     }
   };
 
