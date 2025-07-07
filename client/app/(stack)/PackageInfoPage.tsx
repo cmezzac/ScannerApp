@@ -39,7 +39,11 @@ export default function PackageInfoPage() {
             key={index}
             title={`#${item.trackingNumber} - ${item.courrier}`}
             name={item.name}
-            imageUrl={item.photo ? item.photo : base64Image}
+            imageUrl={
+              item.photo
+                ? `data:image/${item.photo.startsWith("iVBORw0KGgo") ? "png" : "jpeg"};base64,${item.photo}`
+                : base64Image
+            }
             scannedDate={new Date(item.scannedDate).toLocaleString("en-US", {
               weekday: "long",
               year: "numeric",
