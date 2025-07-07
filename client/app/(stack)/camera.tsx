@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
   Dimensions,
   SafeAreaView,
 } from "react-native";
@@ -15,6 +14,7 @@ import ReturnButton from "@/components/returnButton";
 import Stepper from "@/components/progress_bar";
 import { useGlobal } from "../../context/globalContext";
 import { enhanceImageForOCR } from "@/services/cameraService";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const { width, height } = Dimensions.get("window");
 
@@ -24,18 +24,23 @@ export default function CameraComponent() {
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<CameraView>(null);
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const takePicture = async () => {
-    if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync();
+    if (!cameraRef.current || loading) return;
 
+    setLoading(true);
+    try {
+      const photo = await cameraRef.current.takePictureAsync();
       if (photo) {
         const enhancedBase64 = await enhanceImageForOCR(photo.uri);
-
         setFullPackageUri(enhancedBase64);
-
         router.push("/cameraDetails");
       }
+    } catch (error) {
+      console.error("❌ Error taking or enhancing picture:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,20 +61,24 @@ export default function CameraComponent() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ReturnButton></ReturnButton>
+      {loading && <LoadingScreen message="Processing Image..." />}
 
-      <ScreenName title="Scanner" isHeader={true}></ScreenName>
+      <ReturnButton />
+      <ScreenName title="Scanner" isHeader={true} />
       <View style={{ marginTop: -20, paddingHorizontal: 20 }}>
         <Stepper currentStep={0} />
       </View>
 
       <View style={styles.cameraContainer}>
-        <CameraView
-          ref={cameraRef}
-          style={StyleSheet.absoluteFill}
-          facing="back"
-        />
+        {!loading && (
+          <CameraView
+            ref={cameraRef}
+            style={StyleSheet.absoluteFill}
+            facing="back"
+          />
+        )}
       </View>
+
       <View style={styles.bottomControls}>
         <TouchableOpacity onPress={takePicture} style={styles.captureOuter}>
           <View style={styles.captureInner} />
@@ -95,11 +104,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#ccc",
   },
-  headerBlock: {
-    marginTop: 0,
-    paddingVertical: 0,
-    gap: 0,
-  },
   centered: {
     flex: 1,
     justifyContent: "center",
@@ -110,14 +114,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     marginTop: 20,
-  },
-  topControls: {
-    position: "absolute",
-    top: "35%",
-    right: 20,
-    flexDirection: "column",
-    alignItems: "flex-end",
-    gap: 12,
   },
   bottomControls: {
     position: "absolute",
@@ -140,92 +136,9 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     backgroundColor: "black",
   },
-  previewContainer: {
-    flex: 1,
-    backgroundColor: "white",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  previewImage: {
-    width: width,
-    height: height * 0.9,
-    resizeMode: "contain",
-  },
-  previewButtons: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "100%",
-    marginTop: 0,
-  },
-  retakeButton: {
-    backgroundColor: "#777",
-    paddingVertical: 14,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-  },
-  submitButton: {
-    backgroundColor: "#00ace6",
-    paddingVertical: 14,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-  },
   buttonText: {
     color: "#fff",
     fontWeight: "600",
     fontSize: 16,
-  },
-  overlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 5,
-    pointerEvents: "none",
-  },
-
-  corner: {
-    position: "absolute",
-    width: "8%",
-    aspectRatio: 1,
-    borderColor: "black",
-  },
-
-  topLeft: {
-    top: "22%",
-    left: "10%",
-    borderTopWidth: 4,
-    borderLeftWidth: 4,
-  },
-
-  topRight: {
-    top: "22%",
-    right: "10%",
-    borderTopWidth: 4,
-    borderRightWidth: 4,
-  },
-
-  bottomLeft: {
-    bottom: "43%",
-    left: "10%",
-    borderBottomWidth: 4,
-    borderLeftWidth: 4,
-  },
-
-  bottomRight: {
-    bottom: "43%",
-    right: "10%",
-    borderBottomWidth: 4,
-    borderRightWidth: 4,
-  },
-  scanNote: {
-    position: "absolute",
-    bottom: "40%",
-    width: "100%",
-    textAlign: "center",
-    fontFamily: "Inter",
-    fontWeight: "600",
-    fontSize: 24,
-    color: "black",
   },
 });

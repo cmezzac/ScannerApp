@@ -4,9 +4,9 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
   Dimensions,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useRouter } from "expo-router";
@@ -15,9 +15,9 @@ import ReturnButton from "@/components/returnButton";
 import Stepper from "@/components/progress_bar";
 import { useGlobal } from "../../context/globalContext";
 import { sendImageToReadShippingLabel } from "@/services/scannerServer";
-import * as ImageManipulator from "expo-image-manipulator";
 import { enhanceImageForOCR } from "@/services/cameraService";
 import { useScannedPackages } from "@/context/scannedPackageContext";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const { width, height } = Dimensions.get("window");
 
@@ -28,53 +28,75 @@ export default function CameraComponent() {
   const cameraRef = useRef<CameraView>(null);
   const router = useRouter();
 
-  const { currentPackage, setCurrentPackage } = useScannedPackages();
+  const { setCurrentPackage } = useScannedPackages();
 
   const [localPackageReady, setLocalPackageReady] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  //Navigate only when localPackageReady so that we guarantee it's updated
   useEffect(() => {
     if (localPackageReady) {
       router.push("/readerDetails");
+      setLoading(false);
+    } else {
+      // Resume preview when NOT navigating
+      cameraRef.current?.resumePreview().catch((err) => {
+        console.warn("Failed to resume preview:", err);
+      });
     }
   }, [localPackageReady]);
 
   const takePicture = async () => {
-    if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync();
+    if (!cameraRef.current) return;
 
-      if (photo) {
-        setDetailsUri(photo.uri);
+    await cameraRef.current.pausePreview();
 
-        try {
-          const detailsImage = await enhanceImageForOCR(photo.uri);
+    const photo = await cameraRef.current.takePictureAsync();
+    if (!photo) return;
 
-          const result = await sendImageToReadShippingLabel(
-            detailsImage,
-            fullPackageUri
-          );
+    setDetailsUri(photo.uri);
+    setLoading(true);
 
-          console.log("Server response:", result);
+    try {
+      const detailsImage = await enhanceImageForOCR(photo.uri);
 
-          // Parse and set currentPackage (auto-added in context)
-          const { apartment, courier, name, trackingNumber, urgent } = result;
+      const result = await sendImageToReadShippingLabel(
+        detailsImage,
+        fullPackageUri
+      );
 
-          setCurrentPackage({
-            apartment,
-            name,
-            urgent,
-            title: `Package - ${courier} (${trackingNumber})`,
-            imageUrl: fullPackageUri,
-            trackingNumber,
-          });
+      console.log("Server response:", result);
 
-          setLocalPackageReady(true); // ✅ Delay navigation until confirmed
-        } catch (error) {
-          console.log("Error sending image", error);
-        }
-
-        router.push("/readerDetails");
+      if (!result || !result.name || !result.trackingNumber) {
+        throw new Error("Missing required fields in server response.");
       }
+
+      const { apartment, courier, name, trackingNumber, urgent } = result;
+
+      setCurrentPackage({
+        apartment,
+        name,
+        urgent,
+        title: `Package - ${courier} (${trackingNumber})`,
+        imageUrl: fullPackageUri,
+        trackingNumber,
+      });
+
+      setLocalPackageReady(true);
+    } catch (error) {
+      console.error("❌ Error while processing image:", error);
+      Alert.alert(
+        "Label Processing Failed",
+        "We couldn’t read the label. Please try again.",
+        [
+          {
+            text: "OK",
+            onPress: async () => {
+              await cameraRef.current?.resumePreview();
+              setLoading(false);
+            },
+          },
+        ]
+      );
     }
   };
 
@@ -95,9 +117,10 @@ export default function CameraComponent() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ReturnButton></ReturnButton>
+      {loading && <LoadingScreen message="Extracting Information..." />}
 
-      <ScreenName title="Scanner" isHeader={true}></ScreenName>
+      <ReturnButton />
+      <ScreenName title="Scanner" isHeader={true} />
       <View style={{ marginTop: -20, paddingHorizontal: 20 }}>
         <Stepper currentStep={1} />
       </View>
@@ -109,6 +132,7 @@ export default function CameraComponent() {
           facing="back"
         />
       </View>
+
       <View style={styles.bottomControls}>
         <TouchableOpacity onPress={takePicture} style={styles.captureOuter}>
           <View style={styles.captureInner} />
@@ -134,11 +158,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#ccc",
   },
-  headerBlock: {
-    marginTop: 0,
-    paddingVertical: 0,
-    gap: 0,
-  },
   centered: {
     flex: 1,
     justifyContent: "center",
@@ -149,14 +168,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     marginTop: 20,
-  },
-  topControls: {
-    position: "absolute",
-    top: "35%",
-    right: 20,
-    flexDirection: "column",
-    alignItems: "flex-end",
-    gap: 12,
   },
   bottomControls: {
     position: "absolute",
@@ -179,92 +190,9 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     backgroundColor: "black",
   },
-  previewContainer: {
-    flex: 1,
-    backgroundColor: "white",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  previewImage: {
-    width: width,
-    height: height * 0.9,
-    resizeMode: "contain",
-  },
-  previewButtons: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "100%",
-    marginTop: 0,
-  },
-  retakeButton: {
-    backgroundColor: "#777",
-    paddingVertical: 14,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-  },
-  submitButton: {
-    backgroundColor: "#00ace6",
-    paddingVertical: 14,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-  },
   buttonText: {
     color: "#fff",
     fontWeight: "600",
     fontSize: 16,
-  },
-  overlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 5,
-    pointerEvents: "none",
-  },
-
-  corner: {
-    position: "absolute",
-    width: "8%",
-    aspectRatio: 1,
-    borderColor: "black",
-  },
-
-  topLeft: {
-    top: "22%",
-    left: "10%",
-    borderTopWidth: 4,
-    borderLeftWidth: 4,
-  },
-
-  topRight: {
-    top: "22%",
-    right: "10%",
-    borderTopWidth: 4,
-    borderRightWidth: 4,
-  },
-
-  bottomLeft: {
-    bottom: "43%",
-    left: "10%",
-    borderBottomWidth: 4,
-    borderLeftWidth: 4,
-  },
-
-  bottomRight: {
-    bottom: "43%",
-    right: "10%",
-    borderBottomWidth: 4,
-    borderRightWidth: 4,
-  },
-  scanNote: {
-    position: "absolute",
-    bottom: "40%",
-    width: "100%",
-    textAlign: "center",
-    fontFamily: "Inter",
-    fontWeight: "600",
-    fontSize: 24,
-    color: "black",
   },
 });
