@@ -37,3 +37,15 @@ export type ConfirmedApartmentGroup = {
     confirmedDate: string;
   }[];
 };
+
+export type AuthUser = {
+  userId: string;
+  fullName: string;
+  buildingName: string;
+  buildingId: string;
+};
+
+export type AuthSession = {
+  accessToken: string;
+  refreshToken: string;
+};
