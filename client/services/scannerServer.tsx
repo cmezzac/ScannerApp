@@ -7,6 +7,14 @@ export const sendImageToReadShippingLabel = async (
 
   console.log("🔄 Sending images to:", endpoint);
 
+  if (detailsPhoto != null) {
+    console.log("Details photo is not null");
+  }
+
+  if (fullImagePhoto != null) {
+    console.log("Full Image photo is not null");
+  }
+
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout

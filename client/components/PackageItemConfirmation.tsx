@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { fetchPreSignedS3Photo } from "@/services/imageService";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import Collapsible from "react-native-collapsible";
 import Icon from "react-native-vector-icons/Feather";
@@ -21,8 +22,24 @@ export default function PackageItemConfirmation({
   urgent,
 }: PackageItemWithDateProps) {
   const [collapsed, setCollapsed] = useState(true);
+  const [signedUrl, setSignedUrl] = useState<string | null>(null);
 
   const toggleExpanded = () => setCollapsed(!collapsed);
+
+  useEffect(() => {
+    const fetchUrl = async () => {
+      if (!imageUrl) return;
+
+      try {
+        const signed = await fetchPreSignedS3Photo(imageUrl);
+        setSignedUrl(signed);
+      } catch (err) {
+        console.error("Failed to fetch signed URL:", err);
+      }
+    };
+
+    fetchUrl();
+  }, [imageUrl]);
 
   return (
     <View style={styles.wrapper}>
@@ -46,8 +63,8 @@ export default function PackageItemConfirmation({
           <Text>{confirmedDate}</Text>
           <Text style={styles.label}>Urgent</Text>
           <Text>{urgent ? "Yes" : "No"}</Text>
-          {imageUrl ? (
-            <Image source={{ uri: imageUrl }} style={styles.image} />
+          {signedUrl ? (
+            <Image source={{ uri: signedUrl }} style={styles.image} />
           ) : null}
         </View>
       </Collapsible>

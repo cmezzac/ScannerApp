@@ -34,7 +34,7 @@ export default function HomeScreen() {
           </View>
           <Text style={styles.countText}>{packageCount}</Text>
           <View style={styles.viewPendingRow}>
-            <Text style={styles.viewPendingText}>View pending packages</Text>
+            <Text style={styles.viewPendingText}>View confirmed packages</Text>
             <Feather name="chevron-right" size={20} color="#007AFF" />
           </View>
         </TouchableOpacity>

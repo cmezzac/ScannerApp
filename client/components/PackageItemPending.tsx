@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import Collapsible from "react-native-collapsible";
 import Icon from "react-native-vector-icons/Feather";
+import { fetchPreSignedS3Photo } from "../services/imageService";
 
 type PackageItemPendingProps = {
   title: string;
@@ -19,6 +20,23 @@ export default function PackageItemPending({
   urgent,
 }: PackageItemPendingProps) {
   const [collapsed, setCollapsed] = useState(true);
+
+  const [signedUrl, setSignedUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUrl = async () => {
+      if (!imageUrl) return;
+
+      try {
+        const signed = await fetchPreSignedS3Photo(imageUrl);
+        setSignedUrl(signed);
+      } catch (err) {
+        console.error("Failed to fetch signed URL:", err);
+      }
+    };
+
+    fetchUrl();
+  }, [imageUrl]);
 
   const toggleExpanded = () => setCollapsed(!collapsed);
 
@@ -45,8 +63,8 @@ export default function PackageItemPending({
           <Text style={styles.label}>Urgent</Text>
           <Text>{urgent ? "Yes" : "No"}</Text>
 
-          {imageUrl ? (
-            <Image source={{ uri: imageUrl }} style={styles.image} />
+          {signedUrl ? (
+            <Image source={{ uri: signedUrl }} style={styles.image} />
           ) : null}
         </View>
       </Collapsible>

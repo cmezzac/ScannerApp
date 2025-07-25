@@ -5,7 +5,6 @@ import ReturnButton from "@/components/returnButton";
 import ScreenName from "@/components/screenName";
 import PackageItem from "@/components/PackageItemConfirmation";
 import { useConfirmedPackages } from "@/context/confirmedPackageContext";
-import { useState } from "react";
 import { image1, image2, image3, image4 } from "@/constants";
 
 export default function PackageInfoPage() {
@@ -39,11 +38,7 @@ export default function PackageInfoPage() {
             key={index}
             title={`#${item.trackingNumber} - ${item.courrier}`}
             name={item.name}
-            imageUrl={
-              item.photo
-                ? `data:image/${item.photo.startsWith("iVBORw0KGgo") ? "png" : "jpeg"};base64,${item.photo}`
-                : base64Image
-            }
+            imageUrl={item.photo ? item.photo : base64Image}
             scannedDate={new Date(item.scannedDate).toLocaleString("en-US", {
               weekday: "long",
               year: "numeric",
