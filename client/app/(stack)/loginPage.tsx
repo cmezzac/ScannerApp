@@ -11,40 +11,36 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { useAuth } from "@/context/autheticationContext";
+import { verifyLogin } from "@/services/authService";
+import { useRouter } from "expo-router";
 
 export default function LoginPage() {
-  const [userId, setUserId] = useState("");
-  const [buildingId, setBuildingId] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   const { login } = useAuth();
 
   const handleLogin = async () => {
-    if (!userId || !buildingId) {
+    if (!username || !password) {
       Alert.alert("Missing Fields", "Please enter all fields.");
       return;
     }
 
     try {
       setLoading(true);
-      const response = await fetch("https://your-api.com/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId, buildingId }),
-      });
 
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || "Login failed");
-      }
+      const user = await verifyLogin(username, password);
+      console.log(user);
 
-      const { user, accessToken, refreshToken } = await response.json();
-      await login(user, accessToken, refreshToken);
+      await login(user, user.accessToken, user.refreshToken);
+
+      router.replace("/");
     } catch (err: any) {
       Alert.alert("Login Failed", err.message || "Something went wrong.");
-      console.error("🔴 Login error:", err);
+      console.error("Login error:", err);
     } finally {
       setLoading(false);
     }
@@ -63,15 +59,15 @@ export default function LoginPage() {
         <TextInput
           style={styles.input}
           placeholder="User ID"
-          value={userId}
-          onChangeText={setUserId}
+          value={username}
+          onChangeText={setUsername}
           placeholderTextColor="#888"
         />
         <TextInput
           style={styles.input}
           placeholder="Building ID"
-          value={buildingId}
-          onChangeText={setBuildingId}
+          value={password}
+          onChangeText={setPassword}
           placeholderTextColor="#888"
         />
 

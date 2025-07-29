@@ -38,14 +38,27 @@ export type ConfirmedApartmentGroup = {
   }[];
 };
 
-export type AuthUser = {
-  userId: string;
-  fullName: string;
-  buildingName: string;
-  buildingId: string;
-};
-
 export type AuthSession = {
   accessToken: string;
   refreshToken: string;
+};
+
+export type AuthUser = {
+  id: string;
+  username: string;
+  accessToken: string;
+  refreshToken: string;
+  buildingId: {
+    _id: string;
+    name: string;
+    adress: string;
+    __v: number;
+  };
+  role: {
+    _id: string;
+    name: string;
+    role_id: number;
+    privileges: string[];
+    __v: number;
+  };
 };

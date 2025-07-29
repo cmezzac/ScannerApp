@@ -17,7 +17,7 @@ export default function TabLayout() {
   if (loading) return null; // or <ActivityIndicator />
 
   // Not logged in → redirect to login page
-  if (isLoggedIn) {
+  if (!isLoggedIn) {
     return <Redirect href="/(stack)/loginPage" />;
   }
 
