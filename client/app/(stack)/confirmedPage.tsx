@@ -16,12 +16,14 @@ import ReturnButton from "@/components/returnButton";
 import ScreenName from "@/components/screenName";
 import { fetchConfirmedPackages } from "@/services/packageService";
 import { useConfirmedPackages } from "@/context/confirmedPackageContext";
+import { useAuth } from "../../context/autheticationContext";
 
 const { width } = Dimensions.get("window");
 
 export default function ConfirmedPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const { accessToken } = useAuth();
 
   const {
     allConfirmedPackages,
@@ -34,7 +36,7 @@ export default function ConfirmedPage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await fetchConfirmedPackages();
+        const response = await fetchConfirmedPackages(accessToken);
         if (response?.length) {
           setAllConfirmedPackages(response);
         } else {

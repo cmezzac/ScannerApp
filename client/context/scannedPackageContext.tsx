@@ -20,6 +20,7 @@ interface ScannedPackageContextType {
   groupedPackages: GroupedPackages;
   addPackageToApartment: (apartment: string, pkg: PackageDetails) => void;
   getPackageSummary: () => { apartment: string; count: number }[];
+  getAllTrackingNumbers: () => string[];
   currentPackage: PackageDetails | null;
   setCurrentPackage: (pkg: PackageDetails | null) => void;
 }
@@ -57,12 +58,19 @@ export const ScannedPackageProvider = ({
     }));
   };
 
+  const getAllTrackingNumbers = (): string[] => {
+    return Object.values(groupedPackages)
+      .flat()
+      .map((pkg) => pkg.trackingNumber);
+  };
+
   return (
     <ScannedPackageContext.Provider
       value={{
         groupedPackages,
         addPackageToApartment,
         getPackageSummary,
+        getAllTrackingNumbers,
         currentPackage,
         setCurrentPackage,
       }}

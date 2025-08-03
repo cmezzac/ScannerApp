@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import Collapsible from "react-native-collapsible";
 import Icon from "react-native-vector-icons/Feather";
+import { useAuth } from "../context/autheticationContext";
 
 type PackageItemWithDateProps = {
   title: string;
@@ -24,6 +25,8 @@ export default function PackageItemConfirmation({
   const [collapsed, setCollapsed] = useState(true);
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
 
+  const { accessToken } = useAuth();
+
   const toggleExpanded = () => setCollapsed(!collapsed);
 
   useEffect(() => {
@@ -31,7 +34,7 @@ export default function PackageItemConfirmation({
       if (!imageUrl) return;
 
       try {
-        const signed = await fetchPreSignedS3Photo(imageUrl);
+        const signed = await fetchPreSignedS3Photo(imageUrl, accessToken);
         setSignedUrl(signed);
       } catch (err) {
         console.error("Failed to fetch signed URL:", err);

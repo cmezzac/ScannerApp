@@ -1,6 +1,7 @@
 export const sendImageToReadShippingLabel = async (
   detailsPhoto: string,
-  fullImagePhoto: string
+  fullImagePhoto: string,
+  token: any
 ) => {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const endpoint = `${apiUrl}/reader/readShippingLabel`;
@@ -22,7 +23,9 @@ export const sendImageToReadShippingLabel = async (
     const response = await fetch(endpoint, {
       method: "POST",
       headers: {
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
+        Accept: "application/json",
       },
       body: JSON.stringify({
         detailsImage: detailsPhoto,

@@ -16,6 +16,7 @@ import ScreenName from "@/components/screenName";
 import { usePendingPackages } from "@/context/pendingPackageContext";
 import { ApartmentSummary } from "@/types/types";
 import { fetchPendingPackages } from "@/services/packageService";
+import { useAuth } from "../../context/autheticationContext";
 
 const { width } = Dimensions.get("window");
 
@@ -23,6 +24,7 @@ export default function PendingPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { accessToken } = useAuth();
 
   const { allPackages, setSelectedApartment, setAllPackages } =
     usePendingPackages();
@@ -30,7 +32,7 @@ export default function PendingPage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await fetchPendingPackages();
+        const response = await fetchPendingPackages(accessToken);
         if (!response || response.length === 0) {
           console.warn("No packages received");
         } else {

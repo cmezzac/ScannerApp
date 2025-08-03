@@ -10,31 +10,47 @@ import {
 
 import PackageModal from "./DropDownModal";
 
+import { ActivityIndicator } from "react-native";
+
 const { width } = Dimensions.get("window");
 
 import * as Haptics from "expo-haptics";
-import { Audio } from "expo-av";
 
 import { useRouter } from "expo-router";
 import { useScannedPackages } from "@/context/scannedPackageContext";
 
-const router = useRouter();
+import { notifyUsers } from "@/services/smsService";
 
-const handlePress = async () => {
-  await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-
-  const { sound } = await Audio.Sound.createAsync(
-    require("../assets/NotifySucess.mp3")
-  );
-  await sound.playAsync();
-  router.push("/(stack)/ConfirmationPage");
-};
+import { useAuth } from "../context/autheticationContext";
 
 export default function ScanPackageBox() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedApartment, setSelectedApartment] = useState<string | null>(
     null
   );
+
+  const [loading, setLoading] = useState(false);
+
+  const { getAllTrackingNumbers } = useScannedPackages();
+
+  const { accessToken } = useAuth();
+
+  const router = useRouter();
+
+  const handlePress = async () => {
+    try {
+      setLoading(true);
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      const trackingNumbers = getAllTrackingNumbers();
+      console.log(trackingNumbers);
+      await notifyUsers(trackingNumbers, accessToken);
+      router.push("/(stack)/ConfirmationPage");
+    } catch (err) {
+      console.error("Failed to notify users:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const [packages, setPackages] = useState<
     { apartment: string; count: number }[]
@@ -84,19 +100,21 @@ export default function ScanPackageBox() {
       </ScrollView>
       <View style={{ alignItems: "center" }}>
         <TouchableOpacity
-          disabled={!isNotifyGreen}
-          onPress={() => {
-            handlePress();
-          }}
+          disabled={!isNotifyGreen || loading}
+          onPress={handlePress}
         >
-          <Text
-            style={[
-              styles.notify,
-              { color: isNotifyGreen ? "#4CD964" : "#808080" },
-            ]}
-          >
-            NOTIFY
-          </Text>
+          {loading ? (
+            <ActivityIndicator size="small" color="#4CD964" />
+          ) : (
+            <Text
+              style={[
+                styles.notify,
+                { color: isNotifyGreen ? "#4CD964" : "#808080" },
+              ]}
+            >
+              NOTIFY
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
       {selectedApartment && (

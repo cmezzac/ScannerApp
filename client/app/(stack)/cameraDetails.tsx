@@ -18,6 +18,7 @@ import { sendImageToReadShippingLabel } from "@/services/scannerServer";
 import { enhanceImageForOCR } from "@/services/cameraService";
 import { useScannedPackages } from "@/context/scannedPackageContext";
 import LoadingScreen from "@/components/LoadingScreen";
+import { useAuth } from "../../context/autheticationContext";
 
 const { width, height } = Dimensions.get("window");
 
@@ -32,7 +33,7 @@ export default function CameraComponent() {
 
   const [localPackageReady, setLocalPackageReady] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const { accessToken } = useAuth();
   useEffect(() => {
     if (localPackageReady) {
       router.push("/readerDetails");
@@ -61,7 +62,8 @@ export default function CameraComponent() {
 
       const result = await sendImageToReadShippingLabel(
         detailsImage,
-        fullPackageUri
+        fullPackageUri,
+        accessToken
       );
 
       console.log("Server response:", result);
