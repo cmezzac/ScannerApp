@@ -14,6 +14,7 @@ type PackageInfo = {
   name: string;
   urgent: boolean;
   imageUrl: string;
+  trackingNumber: string;
 };
 
 type PackageModalProps = {
@@ -46,7 +47,7 @@ export default function PackageModal({
         <View style={styles.handleBar} />
 
         {/* Title */}
-        <Text style={styles.title}>Apartment 2000</Text>
+        <Text style={styles.title}>{apartment}</Text>
 
         {/* Package List */}
         <ScrollView style={styles.scrollArea}>
@@ -57,6 +58,8 @@ export default function PackageModal({
               name={item.name}
               urgent={item.urgent}
               imageUrl={item.imageUrl}
+              apartment={apartment}
+              trackingNumber={item.trackingNumber}
             />
           ))}
         </ScrollView>

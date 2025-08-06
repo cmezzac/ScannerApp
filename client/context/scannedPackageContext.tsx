@@ -1,5 +1,4 @@
 // context/scannedPackageContext.tsx
-
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 // Types
@@ -19,6 +18,8 @@ type GroupedPackages = {
 interface ScannedPackageContextType {
   groupedPackages: GroupedPackages;
   addPackageToApartment: (apartment: string, pkg: PackageDetails) => void;
+  removePackagesFromApartment: (apartment: string) => void;
+  removeSinglePackage: (apartment: string, trackingNumber: string) => void;
   getPackageSummary: () => { apartment: string; count: number }[];
   getAllTrackingNumbers: () => string[];
   currentPackage: PackageDetails | null;
@@ -51,6 +52,34 @@ export const ScannedPackageProvider = ({
     });
   };
 
+  const removePackagesFromApartment = (apartment: string) => {
+    setGroupedPackages((prev) => {
+      const updated = { ...prev };
+      delete updated[apartment];
+      return updated;
+    });
+  };
+
+  const removeSinglePackage = (apartment: string, trackingNumber: string) => {
+    setGroupedPackages((prev) => {
+      const existing = prev[apartment] || [];
+      const filtered = existing.filter(
+        (pkg) => pkg.trackingNumber !== trackingNumber
+      );
+
+      if (filtered.length === 0) {
+        const updated = { ...prev };
+        delete updated[apartment];
+        return updated;
+      }
+
+      return {
+        ...prev,
+        [apartment]: filtered,
+      };
+    });
+  };
+
   const getPackageSummary = () => {
     return Object.entries(groupedPackages).map(([apartment, pkgs]) => ({
       apartment,
@@ -69,6 +98,8 @@ export const ScannedPackageProvider = ({
       value={{
         groupedPackages,
         addPackageToApartment,
+        removePackagesFromApartment,
+        removeSinglePackage,
         getPackageSummary,
         getAllTrackingNumbers,
         currentPackage,

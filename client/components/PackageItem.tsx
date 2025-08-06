@@ -1,12 +1,24 @@
+import { useScannedPackages } from "@/context/scannedPackageContext";
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Alert,
+} from "react-native";
 import Collapsible from "react-native-collapsible";
 import Icon from "react-native-vector-icons/Feather";
+
 type PackageItemProps = {
   title: string;
   name: string;
   urgent: boolean;
   imageUrl: string;
+  apartment: string;
+  trackingNumber: string;
+  onDelete?: () => void;
 };
 
 export default function PackageItem({
@@ -14,22 +26,47 @@ export default function PackageItem({
   name,
   urgent,
   imageUrl,
+  apartment,
+  trackingNumber,
+  onDelete,
 }: PackageItemProps) {
   const [collapsed, setCollapsed] = useState(true);
 
   const toggleExpanded = () => setCollapsed(!collapsed);
 
+  const { removePackagesFromApartment, removeSinglePackage } =
+    useScannedPackages();
+
+  const confirmDelete = () => {
+    console.log("trying to delete: ", trackingNumber);
+    Alert.alert("Delete Packages", `Are you sure you want to this package?`, [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => removeSinglePackage(apartment, trackingNumber),
+      },
+    ]);
+  };
+
   return (
     <View style={styles.wrapper}>
-      <TouchableOpacity onPress={toggleExpanded} style={styles.header}>
-        <View style={styles.radioCircle} />
-        <Text style={styles.title}>{title}</Text>
-        <Icon
-          name={collapsed ? "chevron-down" : "chevron-up"}
-          size={20}
-          color="#666"
-        />
-      </TouchableOpacity>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={toggleExpanded} style={styles.headerContent}>
+          <View style={styles.radioCircle} />
+          <Text style={styles.title}>{title}</Text>
+          <Icon
+            name={collapsed ? "chevron-down" : "chevron-up"}
+            size={20}
+            color="#666"
+          />
+        </TouchableOpacity>
+
+        {/* Delete Button */}
+        <TouchableOpacity onPress={confirmDelete} style={styles.deleteButton}>
+          <Icon name="trash-2" size={18} color="#fff" />
+        </TouchableOpacity>
+      </View>
 
       <Collapsible collapsed={collapsed}>
         <View style={styles.body}>
@@ -58,6 +95,12 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
+  },
+  headerContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
   },
   radioCircle: {
     width: 18,
@@ -72,9 +115,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
   },
-  arrow: {
-    fontSize: 18,
-    color: "#666",
+  deleteButton: {
+    backgroundColor: "red",
+    padding: 6,
+    borderRadius: 6,
+    marginLeft: 8,
   },
   body: {
     marginTop: 12,
@@ -85,7 +130,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: "70%",
+    height: 200,
     marginTop: 10,
     borderRadius: 8,
   },
