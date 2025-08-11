@@ -31,7 +31,12 @@ export default function ScanPackageBox() {
 
   const [loading, setLoading] = useState(false);
 
-  const { getAllTrackingNumbers } = useScannedPackages();
+  const {
+    groupedPackages,
+    getPackageSummary,
+    getAllTrackingNumbers,
+    removePackagesFromApartment,
+  } = useScannedPackages();
 
   const { accessToken } = useAuth();
 
@@ -60,9 +65,6 @@ export default function ScanPackageBox() {
     setSelectedApartment(apartment);
     setIsModalVisible(true);
   };
-
-  const { groupedPackages, getPackageSummary, addPackageToApartment } =
-    useScannedPackages();
 
   useEffect(() => {
     const result = getPackageSummary();
