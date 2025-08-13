@@ -17,6 +17,7 @@ import ScreenName from "@/components/screenName";
 import { fetchConfirmedPackages } from "@/services/packageService";
 import { useConfirmedPackages } from "@/context/confirmedPackageContext";
 import { useAuth } from "../../context/autheticationContext";
+import ScreenContainer from "@/components/ScreenContainer";
 
 const { width } = Dimensions.get("window");
 
@@ -63,10 +64,10 @@ export default function ConfirmedPage() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenContainer style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.inner}>
-        <ReturnButton />
+        <ReturnButton topOffsetAndroid={24} />
         <ScreenName title="Confirmed Packages" isHeader={false} />
 
         <TextInput
@@ -125,7 +126,7 @@ export default function ConfirmedPage() {
           )}
         </View>
       </View>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 

@@ -10,12 +10,13 @@ import ScreenName from "@/components/screenName";
 import ScanPackageBox from "@/components/scanPackageBox";
 import ScanButton from "@/components/ScanButton";
 import { useRouter } from "expo-router";
+import ScreenContainer from "@/components/ScreenContainer";
 
 export default function ScannerPage() {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.bigContainer}>
+    <ScreenContainer style={styles.bigContainer}>
       <ScreenName title="Scan Packages" isHeader={false} />
       <View style={styles.scannedTextWrapper}>
         <Text style={styles.scannedText}>Scanned</Text>
@@ -33,7 +34,7 @@ export default function ScannerPage() {
       >
         <ScanButton />
       </TouchableOpacity>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 

@@ -19,6 +19,7 @@ import { enhanceImageForOCR } from "@/services/cameraService";
 import { useScannedPackages } from "@/context/scannedPackageContext";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useAuth } from "../../context/autheticationContext";
+import ScreenContainer from "@/components/ScreenContainer";
 
 const { width, height } = Dimensions.get("window");
 
@@ -118,7 +119,7 @@ export default function CameraComponent() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenContainer style={styles.container}>
       {loading && <LoadingScreen message="Extracting Information..." />}
 
       <ReturnButton />
@@ -140,7 +141,7 @@ export default function CameraComponent() {
           <View style={styles.captureInner} />
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 

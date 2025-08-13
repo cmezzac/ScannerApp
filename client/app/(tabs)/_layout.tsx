@@ -8,6 +8,7 @@ import TabBarBackground from "@/boiler_plate_components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuth } from "@/context/autheticationContext";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -41,7 +42,7 @@ export default function TabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+            <Ionicons size={28} name="home" color={color} />
           ),
         }}
       />
@@ -50,7 +51,11 @@ export default function TabLayout() {
         options={{
           title: "Scan",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="shippingbox" color={color} />
+            <MaterialCommunityIcons
+              name="barcode-scan"
+              size={28}
+              color={color}
+            />
           ),
         }}
       />
@@ -59,7 +64,7 @@ export default function TabLayout() {
         options={{
           title: "Profile",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="person.circle" color={color} />
+            <Ionicons size={28} name="person-circle" color={color} />
           ),
         }}
       />

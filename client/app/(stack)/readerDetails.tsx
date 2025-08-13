@@ -13,6 +13,7 @@ import {
 import Stepper from "@/components/progress_bar";
 import { useRouter } from "expo-router";
 import { useScannedPackages } from "@/context/scannedPackageContext";
+import ScreenContainer from "@/components/ScreenContainer";
 
 export default function ReaderDetails() {
   const [isEnabled, setIsEnabled] = useState(false);
@@ -40,7 +41,7 @@ export default function ReaderDetails() {
   }, [currentPackage]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenContainer style={styles.container}>
       <ReturnButton />
       <ScreenName title="Confirmation" isHeader />
       <View style={{ marginTop: -20, paddingHorizontal: 20 }}>
@@ -81,7 +82,7 @@ export default function ReaderDetails() {
           <Text style={styles.buttonText}>Confirm</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 

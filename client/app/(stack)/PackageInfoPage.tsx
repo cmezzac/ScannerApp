@@ -6,6 +6,7 @@ import ScreenName from "@/components/screenName";
 import PackageItem from "@/components/PackageItemConfirmation";
 import { useConfirmedPackages } from "@/context/confirmedPackageContext";
 import { image1, image2, image3, image4 } from "@/constants";
+import ScreenContainer from "@/components/ScreenContainer";
 
 export default function PackageInfoPage() {
   const { selectedConfirmedApartment, allConfirmedPackages } =
@@ -21,8 +22,8 @@ export default function PackageInfoPage() {
   const packages = apartmentData?.packages || [];
 
   return (
-    <SafeAreaView style={styles.bigContainer}>
-      <ReturnButton />
+    <ScreenContainer style={styles.bigContainer}>
+      <ReturnButton topOffsetAndroid={24} />
       <ScreenName title="Confirmed" isHeader={false} />
       <View style={styles.scannedTextWrapper}>
         <Text style={styles.scannedText}>Packages</Text>
@@ -64,7 +65,7 @@ export default function PackageInfoPage() {
           />
         ))}
       </ScrollView>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 

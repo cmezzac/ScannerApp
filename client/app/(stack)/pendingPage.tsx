@@ -17,6 +17,7 @@ import { usePendingPackages } from "@/context/pendingPackageContext";
 import { ApartmentSummary } from "@/types/types";
 import { fetchPendingPackages } from "@/services/packageService";
 import { useAuth } from "../../context/autheticationContext";
+import ScreenContainer from "@/components/ScreenContainer";
 
 const { width } = Dimensions.get("window");
 
@@ -65,10 +66,10 @@ export default function PendingPage() {
   }, [packages, searchTerm]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenContainer style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.inner}>
-        <ReturnButton />
+        <ReturnButton topOffsetAndroid={24} />
         <ScreenName title="Pending Packages" isHeader={false} />
 
         <TextInput
@@ -127,7 +128,7 @@ export default function PendingPage() {
           )}
         </View>
       </View>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 

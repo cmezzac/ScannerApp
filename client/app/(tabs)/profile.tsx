@@ -8,6 +8,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useAuth } from "@/context/autheticationContext";
+import ScreenContainer from "@/components/ScreenContainer";
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
@@ -19,7 +20,7 @@ export default function ProfilePage() {
   if (!user) return null;
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <ScreenContainer style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.header}>Profile</Text>
 
@@ -43,7 +44,7 @@ export default function ProfilePage() {
           <Button title="Log Out" onPress={handleLogout} color="#FF3B30" />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 

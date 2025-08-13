@@ -5,6 +5,7 @@ import ScreenName from "@/components/screenName";
 import PackageItem from "@/components/PackageItemPending";
 import { usePendingPackages } from "@/context/pendingPackageContext";
 import { image1, image2, image3, image4 } from "@/constants";
+import ScreenContainer from "@/components/ScreenContainer";
 
 export default function PendingPackageInfoPage() {
   const { selectedApartment, allPackages } = usePendingPackages();
@@ -15,7 +16,7 @@ export default function PendingPackageInfoPage() {
   if (!allPackages) {
     return (
       <SafeAreaView style={styles.bigContainer}>
-        <ReturnButton />
+        <ReturnButton topOffsetAndroid={24} />
         <ScreenName title="Pending" isHeader={false} />
         <Text style={{ padding: 20 }}>Loading packages...</Text>
       </SafeAreaView>
@@ -43,7 +44,7 @@ export default function PendingPackageInfoPage() {
   console.log(packages);
 
   return (
-    <SafeAreaView style={styles.bigContainer}>
+    <ScreenContainer style={styles.bigContainer}>
       <ReturnButton />
       <ScreenName title="Pending" isHeader={false} />
       <View style={styles.scannedTextWrapper}>
@@ -74,7 +75,7 @@ export default function PendingPackageInfoPage() {
           />
         ))}
       </ScrollView>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 

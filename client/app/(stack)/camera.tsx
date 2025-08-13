@@ -15,6 +15,7 @@ import Stepper from "@/components/progress_bar";
 import { useGlobal } from "../../context/globalContext";
 import { enhanceImageForOCR } from "@/services/cameraService";
 import LoadingScreen from "@/components/LoadingScreen";
+import ScreenContainer from "@/components/ScreenContainer";
 
 const { width, height } = Dimensions.get("window");
 
@@ -60,7 +61,7 @@ export default function CameraComponent() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenContainer style={styles.container}>
       {loading && <LoadingScreen message="Processing Image..." />}
 
       <ReturnButton />
@@ -84,7 +85,7 @@ export default function CameraComponent() {
           <View style={styles.captureInner} />
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 

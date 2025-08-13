@@ -14,6 +14,7 @@ import { PendingPackagesProvider } from "@/context/pendingPackageContext";
 import { ConfirmedPackagesProvider } from "@/context/confirmedPackageContext";
 import { ScannedPackageProvider } from "@/context/scannedPackageContext";
 import { AuthProvider } from "@/context/autheticationContext";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -33,17 +34,19 @@ export default function RootLayout() {
           <ScannedPackageProvider>
             <PendingPackagesProvider>
               <ConfirmedPackagesProvider>
-                <Stack>
-                  <Stack.Screen
-                    name="(tabs)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(stack)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen name="+not-found" />
-                </Stack>
+                <SafeAreaProvider>
+                  <Stack>
+                    <Stack.Screen
+                      name="(tabs)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(stack)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen name="+not-found" />
+                  </Stack>
+                </SafeAreaProvider>
                 <StatusBar style="auto" />
               </ConfirmedPackagesProvider>
             </PendingPackagesProvider>
